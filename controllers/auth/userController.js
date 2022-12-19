@@ -1,0 +1,21 @@
+import { User } from "../../models";
+import CustomErrorHandler from "../../services/CustomErrorHandler";
+
+const userController = {
+   async user_details(req, resp, next){
+    try{
+        const user = await User.findOne({_id: req.user._id}).select('-updatedAt -__v');
+
+        if(!user){
+            return next(CustomErrorHandler.notFound());
+        }
+
+        resp.json(user);
+    }
+    catch(err){
+        return next(err)
+    }
+    }
+}
+
+export default userController;
