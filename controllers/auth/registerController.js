@@ -11,8 +11,15 @@ import fs from 'fs';
 const storage = multer.diskStorage({
     destination : (req,file,cb) => cb(null, 'profile_pic/'),
     filename: (req,file,cb) => {
-        const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`;
-        cb(null, uniqueName);
+        if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg") {
+            
+            const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`;
+            cb(null, uniqueName);
+          } else {
+            // cb(null, false);
+            return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
+          }
+        
     }
 });
 const handleMultipartData = multer({storage, limits: { fileSize: 1000000 * 5 }}).single('profile_pic') 
