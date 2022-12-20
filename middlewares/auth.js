@@ -11,6 +11,7 @@ const auth = async (req,resp,next) => {
 
     const token = authHeader.split(' ')[1];
 
+    //token verify for correct is or not
     try{
         const{_id, role} = await JwtService.verify(token);
 

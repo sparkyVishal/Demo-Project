@@ -21,7 +21,7 @@ const refreshController = {
         try {
             refreshtoken = await RefreshToken.findOne({ token: req.body.refresh_token });
 
-            console.log(refreshtoken);
+         
             if (!refreshtoken) {
                 return next(CustomErrorHandler.unAuthorized('Invalid refresh token'));
             }

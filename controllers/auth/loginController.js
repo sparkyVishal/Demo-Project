@@ -56,7 +56,14 @@ const loginController = {
         }
 
         try{
-            await RefreshToken.deleteOne({token: req.body.refresh_token})
+           // await RefreshToken.deleteOne({token: req.body.refresh_token})
+
+           const find = await RefreshToken.findOneAndDelete({token: req.body.refresh_token})
+
+           if(!find){
+            return next(new Error("Token not found"));
+           }
+          
         }
         catch(err){
             return next(err)
