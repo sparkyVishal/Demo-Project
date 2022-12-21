@@ -6,5 +6,6 @@ export {default as userController} from './auth/userController.js';
 
 export {default as refreshController} from './auth/refreshController.js';
 
-
 export {default as productController} from './productController.js';
+
+export {default as taskController} from './taskController.js';

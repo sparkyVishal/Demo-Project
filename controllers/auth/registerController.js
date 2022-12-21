@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
             cb(null, uniqueName);
           } else {
             // cb(null, false);
-            return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
+            return cb(new Error('Only .png, .jpg and .jpeg format are allowed for images!'));
           }
         
     }
@@ -44,8 +44,24 @@ const registerController = {
             const registerSchema = Joi.object({
                 name: Joi.string().min(3).max(30).required(),
                 email: Joi.string().email().required(),
-                password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required(),
-                repeat_password: Joi.ref('password'),
+
+                // password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required(),
+                // repeat_password: Joi.ref('password'),
+
+                // password: Joi.string().min(3).max(15).required(),
+                // repeat_password: Joi.any().valid(Joi.ref('password')).required(),
+
+                password: Joi.string()
+                        .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
+                        .required()
+                        .messages({
+                            "string.pattern.base": `Password should be between 3 to 30 characters and contain letters or numbers only`,
+                            "string.empty": `Password cannot be empty`,
+                            "any.required": `Password is required`,
+                        }),
+
+                repeat_password: Joi.any().valid(Joi.ref('password')).required(),
+
                 mobile: Joi.number().min(10).required(),
             });
     
