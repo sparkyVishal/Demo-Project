@@ -28,40 +28,22 @@ const registerController = {
     async register(req,resp,next){
 
         handleMultipartData(req, resp, async (err) => {
+            
             if(err){
                 return next(CustomErrorHandler.serverError(err.message))
             }
 
-            let filePath;
+            let filePath = '';
             if(req.file){
 
                  filePath = req.file.path;
             }
-            else{
-                filePath = '';
-            }
-
+            
             const registerSchema = Joi.object({
                 name: Joi.string().min(3).max(30).required(),
                 email: Joi.string().email().required(),
-
-                // password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required(),
-                // repeat_password: Joi.ref('password'),
-
-                // password: Joi.string().min(3).max(15).required(),
-                // repeat_password: Joi.any().valid(Joi.ref('password')).required(),
-
-                password: Joi.string()
-                        .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
-                        .required()
-                        .messages({
-                            "string.pattern.base": `Password should be between 3 to 30 characters and contain letters or numbers only`,
-                            "string.empty": `Password cannot be empty`,
-                            "any.required": `Password is required`,
-                        }),
-
-                repeat_password: Joi.any().valid(Joi.ref('password')).required(),
-
+                password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required(),
+                repeat_password: Joi.ref('password'),
                 mobile: Joi.number().min(10).required(),
             });
     
@@ -78,48 +60,35 @@ const registerController = {
 
                 return next(error)
             }
-            //check user is already exists or not
-    
-            try{
-                const exist = await User.exists({email: req.body.email});
-    
-                if(exist){
-                    return next(CustomErrorHandler.alreadyExist("This email is already taken"))
-                }
-            }
-            catch(err){
-                return next(err);
-            }
-
-            //mobile no is already exist
-
-            try{
-                const mobile = await User.exists({mobile: req.body.mobile})
-                if(mobile){
-                    return next(CustomErrorHandler.mobileExists())
-                }
-            }
-            catch(err){
-                return next(err);
-            }
-            const {name, email, password, mobile} = req.body;
-    
-    
-            const hashPassword = await bcrypt.hash(password , 10);
-    
-            const user = new User({
-                name,
-                email,
-                password: hashPassword,
-                profile_pic: filePath,
-                mobile,
-            })
-
+           
             let access_token;
             let refresh_token;
             let result;
-
+    
             try{
+                const {name, email, password, mobile} = req.body;
+
+                const exist = await User.exists({email});
+                if(exist){
+                    return next(CustomErrorHandler.alreadyExist("This email is already taken"))
+                }
+
+                const same_mobile = await User.exists({mobile})
+                if(same_mobile){
+                    return next(CustomErrorHandler.alreadyExist("This mobile number is already taken"))
+                }
+
+                
+                const hashPassword = await bcrypt.hash(password , 10);
+    
+                const user = new User({
+                    name,
+                    email,
+                    password: hashPassword,
+                    profile_pic: filePath,
+                    mobile,
+                })
+
                 result = await user.save();
             
                 //token
@@ -127,14 +96,13 @@ const registerController = {
                 refresh_token =  JwtService.sign({_id: result._id , role: result.role}, '1y', REFRESH_SECRET);
     
                 await RefreshToken.create({token:refresh_token })
-    
+
             }
-            catch (err){
+            catch(err){
                 return next(err);
             }
             resp.json({access_token, refresh_token, result})
         })
-
     }
 }
 

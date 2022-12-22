@@ -9,9 +9,6 @@ class CustomErrorHandler extends Error{
         return new CustomErrorHandler(409, message);
     }
 
-    static mobileExists(message="This number is already taken"){
-        return new CustomErrorHandler(409, message);
-    }
 
     static wrongCrediantals(message = "Email or password is incorrect"){
         return new CustomErrorHandler(401, message);

@@ -1,7 +1,9 @@
 import express from 'express';
 import {APP_PORT,DB_URL} from './config';
 import errorHandler from './middlewares/errorHandler';
-import routes from './routes';
+import routes from './routes/index';
+import authRoutes from './routes/authRouter'
+import productRoute from './routes/productRoute'
 import mongoose from 'mongoose';
 import path from 'path';
 
@@ -23,6 +25,10 @@ app.use(express.urlencoded({extended: false}));
 
 app.use(express.json());
 app.use('/api', routes);
+
+
+app.use('/api', authRoutes);
+app.use('/api', productRoute);
 
 //images show
 app.use('/uploads',express.static('uploads'));

@@ -21,13 +21,13 @@ const loginController = {
 
         try{
             const user = await User.findOne({email: req.body.email})
-
             if(!user){
-                return next(CustomErrorHandler.wrongCrediantals())
+                return next(CustomErrorHandler.wrongCrediantals("Email or password is incorrect"))
             }
+
             const match = await bcrypt.compare(req.body.password, user.password) 
             if(!match){
-                return next(CustomErrorHandler.wrongCrediantals())
+                return next(CustomErrorHandler.wrongCrediantals("Email or password is incorrect"))
             }
 
             //token
@@ -78,19 +78,12 @@ const loginController = {
             const user = await User.findOne({_id: req.user._id});
 
             if(!user){
-                return next(CustomErrorHandler.unAuthorized());
+                return next(CustomErrorHandler.unAuthorized("unAuthorized"));
             }
 
             const changePasswordSchema = Joi.object({
-                password: Joi.string()
-                .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
-                .required()
-                .messages({
-                    "string.pattern.base": `Password should be between 3 to 30 characters and contain letters or numbers only`,
-                    "string.empty": `Password cannot be empty`,
-                    "any.required": `Password is required`,
-                }),
-                repeat_password: Joi.any().valid(Joi.ref('password')).required(),
+                password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required(),
+                repeat_password: Joi.ref('password'),
             });
 
             const {error} = changePasswordSchema.validate(req.body);
@@ -106,23 +99,14 @@ const loginController = {
     
             const userr  = await User.findByIdAndUpdate(user._id, {$set :{password:newHashPassword}})
 
-            let access_token;
-            let refresh_token;
-            let result;
-
-            try{
-                result = await userr.save();
+               const result = await userr.save();
             
                 //token
-                access_token =  JwtService.sign({_id: result._id , role: result.role});
-                refresh_token =  JwtService.sign({_id: result._id , role: result.role}, '1y', REFRESH_SECRET);
+                const access_token =  JwtService.sign({_id: result._id , role: result.role});
+                const refresh_token =  JwtService.sign({_id: result._id , role: result.role}, '1y', REFRESH_SECRET);
     
                 await RefreshToken.create({token:refresh_token })
-    
-            }
-            catch (err){
-                return next(err);
-            }
+
             resp.json({access_token, refresh_token, result})
         }
         catch(err){

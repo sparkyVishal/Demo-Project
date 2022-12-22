@@ -26,16 +26,8 @@ const productController = {
                 return next(CustomErrorHandler.serverError(err.message))
             }
 
-           // console.warn(req.file)
             const filePath = req.file.path;
 
-            //validation
-
-            const productSchema = Joi.object({
-                name: Joi.string().required(),
-                price: Joi.number().required(),
-                size: Joi.string().required(), 
-            });
             const { error } = productSchema.validate(req.body);
             
             if (error) {
@@ -82,13 +74,6 @@ const productController = {
                 filePath = req.file.path;
             }
            
-            //validation
-
-            // const productSchema = Joi.object({
-            //     name: Joi.string().required(),
-            //     price: Joi.number().required(),
-            //     size: Joi.string().required(), 
-            // });
             const { error } = productSchema.validate(req.body);
             
             if (error) {
