@@ -1,12 +1,7 @@
-import express from 'express';
-
-const router = express.Router();
-
-import auth from '../middlewares/auth';
-import admin from '../middlewares/admin';
+import authRoutes from './authRouter';
+import productRoute from './productRoute';
 
 
-//task
-// router.post('/add-task', auth, taskController.store);
+const indexRoutes = [{route:'auth',router:authRoutes},{route:'product',router:productRoute}]
 
-export default router;
+export default indexRoutes

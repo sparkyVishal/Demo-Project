@@ -26,8 +26,11 @@ const productController = {
                 return next(CustomErrorHandler.serverError(err.message))
             }
 
-            const filePath = req.file.path;
+            let filePath = '';
+            if(req.file){
 
+                 filePath = req.file.path;
+            }
             const { error } = productSchema.validate(req.body);
             
             if (error) {
