@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { urlencoded } from 'express';
 import path from 'path';
 import errorHandler from './middlewares/errorHandler';
 import indexRoutes from './routes/index';
@@ -28,6 +28,11 @@ app.use('/uploads',express.static('uploads'));
 global.appRoot2 = path.resolve(__dirname)
 app.use(express.urlencoded({extended: false}));
 app.use('/profile_pic',express.static('profile_pic'));
+
+//category imAGES
+global.catImage = path.resolve(__dirname)
+app.use(express.urlencoded({extended: false}));
+app.use('/category_image', express.static('category_image'));
 
 app.use(errorHandler);
 
