@@ -1,18 +1,51 @@
-import { User } from "../models";
+import { Task } from "../models";
 
 const taskController = {
-    async store(req, resp,next){
-        let user;
-        try{
+    async add(req, resp, next){
+        
+        const{title, description, task_type, created_by} = req.body;
 
-            user = await User.find({_id: req.user._id}).select('-updatedAt -__v');
-            
+        if(title && description && task_type && created_by){
+
+            let document;
+
+            try{
+                document = await Task.create({
+                    title,
+                    description,
+                    task_type,
+                    created_by
+                })
+            }
+            catch(err){
+                return next(err)
+            }
+
+            resp.status(201).json({"msg": "task created" , document})
+
         }
-        catch (err){
+        else{
+            resp.status(400).json("please fill all details")
+        }
+
+    },
+
+    async show_task(req, resp, next){
+        try{
+            const details = await Task.find({created_by: req.params.id}).select('-updatedAt -__v -created_by -createdAt')
+
+            if(!details){
+                resp.status(400).json({"status":"fail", "msg": "no found task for this user"})
+            }
+
+            return resp.json(details)
+        }
+        catch(err){
             return next(err)
         }
-        resp.json(user);
     }
 }
+
+
 
 export default taskController;
