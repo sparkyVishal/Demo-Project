@@ -7,7 +7,7 @@ const router = express.Router();
 
 //Product
 
-router.post('/add_task', taskController.add);
+router.post('/add_task',auth, taskController.add);
 
 router.get('/show_task/:id', taskController.show_task);
 
