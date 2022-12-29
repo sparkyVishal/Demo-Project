@@ -6,166 +6,164 @@ import Joi from "joi";
 import fs from 'fs';
 import productSchema from "../validators/product";
 
-
-const storage = multer.diskStorage({
-    destination : (req,file,cb) => cb(null, 'uploads/'),
-    filename: (req,file,cb) => {
-        const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`;
-        cb(null, uniqueName);
-    }
-});
-
-const handleMultipartData = multer({storage, limits: { fileSize: 1000000 * 5 }}).single('image') // 5mb
-
 const productController = {
     async store(req, resp, next) {
+        const { error } = productSchema.validate(req.body);
+        if (error) {
 
-        //Multi part form data
-        handleMultipartData(req, resp, async (err) => {
-            if(err){
-                return next(CustomErrorHandler.serverError(err.message))
-            }
+            return next(error)
+        }
+        const { name, description, price, offer_price, discount, category } = req.body;
+        let document;
 
-            let filePath = '';
-            if(req.file){
+        try {
+            document = await Product.create({
+                name,
+                description,
+                price,
+                offer_price,
+                discount,
+                category,
 
-                 filePath = req.file.path;
-            }
-            const { error } = productSchema.validate(req.body);
-            
-            if (error) {
-                
-                fs.unlink(`${appRoot}/${filePath}`, (err) => {
-                    if(err){
+            })
+        }
+        catch (err) {
+            return next(err)
+        }
 
-                        return next(CustomErrorHandler.serverError(err.message))
-                    }
-                });
+        resp.status(201).json(document)
 
-                return next(error)
-            }
-
-            const {name, price, size} = req.body;
-            let document;
-
-            try{
-                document = await Product.create({
-                    name,
-                    price,
-                    size,
-                    image: filePath
-                })
-            }
-            catch(err){
-                return next(err)
-            }
-
-            resp.status(201).json(document)
-
-        });
     },
 
 
-    async update(req, resp, next){
-        handleMultipartData(req, resp, async (err) => {
-            if(err){
-                return next(CustomErrorHandler.serverError(err.message))
-            }
+    async update(req, resp, next) {
 
-           let filePath;
-            if(req.file){
-                filePath = req.file.path;
-            }
-           
-            const { error } = productSchema.validate(req.body);
-            
-            if (error) {
-                
-                if(req.file){
-                    fs.unlink(`${appRoot}/${filePath}`, (err) => {
-                        if(err){
-    
-                            return next(CustomErrorHandler.serverError(err.message))
-                        }
-                    });
-                }
+        const { error } = productSchema.validate(req.body);
 
-                return next(error)
-            }
+        if (error) {
 
-            const {name, price, size} = req.body;
-            let document;
+            return next(error)
+        }
 
-            try{
-                document = await Product.findOneAndUpdate({_id: req.params.id}, {
-                    name,
-                    price,
-                    size,
-                    ...(req.file && {image: filePath})
-                }, {new: true});
-            }
-            catch(err){
-                return next(err)
-            }
+        const { name, description, price, offer_price, discount, category } = req.body;
+        let document;
 
-            resp.status(201).json(document)
+        try {
+            document = await Product.findOneAndUpdate({ _id: req.params.id }, {
+                name,
+                description,
+                price,
+                offer_price,
+                discount,
+                category,
+               
+            }, { new: true });
+        }
+        catch (err) {
+            return next(err)
+        }
 
-        });
+        resp.status(201).json(document)
+
+
     },
 
-    async destroy(req, resp, next){
-       const document = await Product.findOneAndRemove({_id: req.params.id});
+    async destroy(req, resp, next) {
+        const document = await Product.findOneAndRemove({ _id: req.params.id });
 
-       if(!document){
-        return next(new Error("Nothing to delete"))
-       }
+        if (!document) {
+            return next(new Error("Nothing to delete"))
+        }
 
-       //image delete
+        //image delete
 
         const imagePath = document._doc.image;
 
         //const imagePath = document.image;
 
         fs.unlink(`${appRoot}/${imagePath}`, (err) => {
-            if(err){
+            if (err) {
                 return next(CustomErrorHandler.serverError())
             }
         });
 
-       resp.json({"status":"success", "msg": "Product deleted successfully", document})
+        resp.json({ "status": "success", "msg": "Product deleted successfully", document })
     },
 
-    async index(req, resp, next){
+    async index(req, resp, next) {
         let documents;
 
-        try{
-            documents = await Product.find().select('-updatedAt -__v').sort({_id: -1});
+        try {
+            documents = await Product.find().select('-updatedAt -__v').sort({ _id: -1 });
 
-            if(!documents[0]){
+            if (!documents[0]) {
                 return next(new Error("Nothing to show"))
             }
         }
-        catch(err){
+        catch (err) {
             return next(CustomErrorHandler.serverError())
         }
 
-        resp.status(200).json({"status":"success", "msg":"list of all products", documents})
+        resp.status(200).json({ "status": "success", "msg": "list of all products", documents })
     },
 
-    async show(req,resp,next){
+    async show(req, resp, next) {
         let document;
 
-        try{
-            document = await Product.findOne({_id: req.params.id}).select('-updatedAt -__v')
+        try {
+            document = await Product.findOne({ _id: req.params.id }).select('-updatedAt -__v')
 
-            if(! document){
+            if (!document) {
                 return next(new Error("No Data found for this id"))
             }
-        }catch(err){
+        } catch (err) {
             return next(CustomErrorHandler.serverError())
         }
 
         resp.json(document)
+    },
+
+    async search(req, resp, next) {
+        let data;
+        try {
+            data = await Product.find(
+                {
+                    "$or": [
+                        { name: { $regex: req.params.key, $options: '$i' } },
+                        { category: { $regex: req.params.key, $options: '$i' } },
+                        { discount: { $regex: req.params.key } },
+                        { price: { "$lt": 100 } },
+                        
+                    ]
+          
+                })
+        }
+        catch (err) {
+            return next(err)
+        }
+
+        return resp.json(data)
+    },
+
+    async price_filter(req, resp, next){
+        let data;
+        try{
+            data = await Product.find(
+                {
+                    $and: [{
+                         price: { "$gt": 100 },
+                    }, {
+                        discount: { "$lt": 20 },
+                    }]
+          
+                })
+
+        }
+        catch(err){
+            return next(err)
+        }
+        console.log(data)
+        return resp.json(data)
     }
 }
 

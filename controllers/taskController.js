@@ -36,20 +36,46 @@ const taskController = {
 
     async show_task(req, resp, next){
         try{
-            const {user} = req
-
-            const details = await Task.find({$or:[{created_by:req.params.id},{task_type:'public'}]}).select('-updatedAt -__v  -createdAt')
             
+            let details;
+
+            if(req.params.type === 'all'){
+
+                 details = await Task.find({$or:[{created_by:req.params.id},{task_type:'public'}]}).select('-updatedAt -__v  -createdAt')
+            }
+            else if(req.params.type === 'public'){
+                 details = await Task.find({$or:[{created_by:req.params.id},{task_type:'public'}]}).select('-updatedAt -__v  -createdAt ').where('task_type', 'public')
+            }
+            else if(req.params.type === 'private'){
+                details = await Task.find({$and:[{created_by:req.params.id},{task_type:'private'}]}).select('-updatedAt -__v  -createdAt ')
+            }
+           
             if(!details){
                 resp.status(400).json({"status":"fail", "msg": "no found task for this user"})
             }
 
-           
+
             return resp.json(details)
         }
         catch(err){
             return next(err)
         }
+    },
+
+    async search(req, resp, next){
+    let data;
+      try{
+         data = await Task.find({
+            "$or": [
+                {title: {$regex: req.params.key, $options: '$i'}}
+            ]
+         }).select('-updatedAt -__v').sort({_id: -1});
+      }
+      catch(err){
+        return next(err)
+      }
+
+      resp.json(data)
     }
 }
 

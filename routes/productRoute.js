@@ -7,10 +7,13 @@ const router = express.Router();
 
 //Product
 
-router.post('/add_product',[auth,admin], productController.store);
-router.put('/update_product/:id',[auth,admin], productController.update);
-router.delete('/delete_product/:id',[auth,admin], productController.destroy);
+router.post('/add_product', productController.store);
+router.put('/update_product/:id', productController.update);
+router.delete('/delete_product/:id', productController.destroy);
 router.get('/products', productController.index);
 router.get('/product/:id', productController.show);
+// router.get('/search/:key', productController.searchProduct);
 
+router.get('/search/:key', productController.search)
+router.get('/search_by_price/:key', productController.price_filter)
 export default router;

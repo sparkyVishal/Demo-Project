@@ -2,9 +2,12 @@ import Joi from "joi";
 
 const productSchema = Joi.object({
     name: Joi.string().required(),
+    description: Joi.string().required(),
     price: Joi.number().required(),
-    size: Joi.string().required(), 
-    image: Joi.string(),
+    offer_price: Joi.number().required(),
+    discount: Joi.string().required(), 
+    category: Joi.string().required(),
+
 });
 
 export default productSchema;

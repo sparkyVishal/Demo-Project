@@ -9,7 +9,10 @@ const router = express.Router();
 
 router.post('/add_task',auth, taskController.add);
 
-router.get('/show_task/:id', taskController.show_task);
+router.get('/show_task/:id/:type', taskController.show_task);
+
+router.get('/search/:key', taskController.search);
+
 
 
 export default router;

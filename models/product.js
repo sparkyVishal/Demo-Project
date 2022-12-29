@@ -6,13 +6,17 @@ const Schema = mongoose.Schema;
 
 const productSchema = new Schema({
     name : {type: String, required: true},
+    description: {type: String, required: true},
     price : {type: Number, required: true},
-    size : {type: String, required: true},
-    image : {type: String, required: true,  get: (image) => {
+    offer_price : {type: Number, required: true},
+    discount : {type: String, required: true},
+    category : {type: String, required: true, enum: ['Electronics', 'Beverages', 'Cosmetics', 'Food', 'Shoes']},
+    // image : {type: String, required: true,  get: (image) => {
 
-        return `${APP_URL}/${image}`;
-    }},
+    //     return `${APP_URL}/${image}`;
+    // }},
 
-}, {timestamps: true, toJSON:{ getters:true }, id: false});
+// }, {timestamps: true, toJSON:{ getters:true }, id: false});
+}, {timestamps: true});
 
 export default mongoose.model('Product', productSchema, "products")
