@@ -35,19 +35,35 @@ const taskController = {
     },
 
     async show_task(req, resp, next){
+        let details;
+        let task_type = 'public';
         try{
-            
-            let details;
+            const {user,query} = req;
 
-            if(req.params.type === 'all'){
+            const {type} = query
 
-                 details = await Task.find({$or:[{created_by:req.params.id},{task_type:'public'}]}).select('-updatedAt -__v  -createdAt')
+
+            let queryToApply = {}
+
+            if(type==='all'){
+                query = {
+                    
+                }
             }
-            else if(req.params.type === 'public'){
-                 details = await Task.find({$or:[{created_by:req.params.id},{task_type:'public'}]}).select('-updatedAt -__v  -createdAt ').where('task_type', 'public')
+           
+            if(req.query.type === 'all'){
+                 details = await Task.find({$or:[{created_by:user._id},{task_type: task_type}]}, {'updatedAt':0, '__v':0})
             }
-            else if(req.params.type === 'private'){
-                details = await Task.find({$and:[{created_by:req.params.id},{task_type:'private'}]}).select('-updatedAt -__v  -createdAt ')
+            else if(req.query.type === 'public'){
+                 details = await Task.find({$or:[{created_by:user._id},{task_type: task_type}]}, {'updatedAt':0, '__v':0}).where('task_type', 'public')
+            }
+            else if(req.query.type === 'private'){
+                details = await Task.find({$and:[{created_by:user._id},{task_type:'private'}]}, {'updatedAt':0, '__v':0})
+            }
+
+            else{
+                details = await Task.find({
+                title:new RegExp(req.query.title,'i')}, {'updatedAt':0, '__v':0}).sort({_id: -1})
             }
            
             if(!details){
@@ -64,12 +80,14 @@ const taskController = {
 
     async search(req, resp, next){
     let data;
+    console.log('req.params.key',req.params.key);
       try{
-         data = await Task.find({
-            "$or": [
-                {title: {$regex: req.params.key, $options: '$i'}}
-            ]
-         }).select('-updatedAt -__v').sort({_id: -1});
+        //  data = await Task.find({
+        //     title:new RegExp(req.params.key,'i')
+        //  }).select('-updatedAt -__v').sort({_id: -1});
+
+        data = await Task.find({
+            title:new RegExp(req.params.key,'i')}, {'updatedAt':0, '__v':0}).sort({_id: -1})
       }
       catch(err){
         return next(err)

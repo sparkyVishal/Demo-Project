@@ -8,7 +8,7 @@ const router = express.Router();
 //Product
 
 router.post('/add_product', productController.store);
-router.patch('/update_product/:id', productController.update);
+router.put('/update_product/:id', productController.update);
 router.delete('/delete_product/:id', productController.destroy);
 router.get('/products', productController.index);
 router.get('/product/:id', productController.show);
@@ -22,7 +22,9 @@ router.get('/search_by_category', productController.productCategory)
 router.get('/search_by_discount', productController.productDiscount)
 router.get('/search_by_price', productController.productdiscountprice)
 router.get('/search_by_pricee', productController.producttprice)
-router.get('/search_by_priceordiscount', productController.productOrdiscount)
+
+
+router.post('/updateall', productController.updateAll)
 
 
 export default router;

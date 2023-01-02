@@ -136,7 +136,6 @@ const productController = {
           { name: { $regex: req.params.key, $options: "$i" } },
           { category: { $regex: req.params.key, $options: "$i" } },
           { discount: { $regex: req.params.key } },
-          // { price: { "$lt": 100 } },
           { price: { $lt: 100, $gt: 200 } },
         ],
       });
@@ -151,7 +150,7 @@ const productController = {
     let data;
     try {
       data = await Product.find({
-        $or: [{ name: { $regex: req.query.name, $options: "$i" } }],
+      name: { $regex: req.query.name, $options: "$i" } ,
       });
     } catch (err) {
       return next(err);
@@ -164,7 +163,7 @@ const productController = {
     let data;
     try {
       data = await Product.find({
-        $or: [{ category: { $regex: req.query.category, $options: "$i" } }],
+         category: { $regex: req.query.category, $options: "$i" } ,
       });
     } catch (err) {
       return next(err);
@@ -177,7 +176,7 @@ const productController = {
     let data;
     try {
       data = await Product.find({
-        $or: [{ discount: { $regex: req.query.discount, $options: "$i" } }],
+            discount: { "$gt": "10%" },
       });
     } catch (err) {
       return next(err);
@@ -213,20 +212,17 @@ const productController = {
     return resp.json(data);
   },
 
-  async productOrdiscount(req, resp, next) {
+  async updateAll(req, resp, next){
     let data;
-    try {
-      data = await Product.find({
-        $or: [{ price: { $gt: 100 } }, { discount: { $gte: 30 } }],
-        
-      });
-    } catch (err) {
-      return next(err);
+    try{
+        data = await Product.updateMany({name: "apple"}, {$set:{discount: +'30'}})
+    }
+    catch(err){
+        return next(err)
     }
 
-    return resp.json(data);
-  },
-
+    resp.json(data)
+  }
 
 };
 
