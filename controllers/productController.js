@@ -215,13 +215,13 @@ const productController = {
   async updateAll(req, resp, next){
     let data;
     try{
-        data = await Product.updateMany({name: "apple"}, {$set:{discount: +'30'}})
+        data = await Product.updateMany({ price: { $lte: 200 } },{ $inc: { price : 200 } })
     }
     catch(err){
         return next(err)
     }
 
-    resp.json(data)
+    return resp.json(data)
   }
 
 };
