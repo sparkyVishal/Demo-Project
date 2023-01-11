@@ -131,8 +131,8 @@ const taskController = {
     async removeKey(req,resp,next){
         let data;
         try{
-            data = await Task.updateMany([ { $unset: "result" } ]).where({task_type: "private"})
-
+        
+            data = await Task.updateMany({title:'hloo'},{$unset:{stat:1}})
         }
         catch(err){
             return next(err)
