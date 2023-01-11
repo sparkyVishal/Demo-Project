@@ -11,3 +11,6 @@ export {default as productController} from './productController.js';
 export {default as taskController} from './taskController.js';
 
 export {default as categoryController} from './categoryController.js';
+
+export {default as blogController} from './blogController.js';
+

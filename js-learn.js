@@ -33,5 +33,19 @@ for(let i = 1; i<=limit; i++){
 
 console.log(result);
 
+//foreach loop s
+
+const total = Array(20).fill('')
+
+total.forEach((element,index)=> {
+    let userObj = {}
+    keyArray.forEach((key) => {
+        userObj[key] = `test ${key} ${index}`
+    })
+    result.push(userObj)
+})
+
+console.log(result);
+
 
 

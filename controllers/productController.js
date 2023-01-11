@@ -215,13 +215,30 @@ const productController = {
   async updateAll(req, resp, next){
     let data;
     try{
-        data = await Product.updateMany({ price: { $lte: 200 } },{ $inc: { price : 200 } })
+        data = await Product.updateMany({ price: { $lte: 400 } },{ $inc: { price : 200 } })
     }
     catch(err){
         return next(err)
     }
 
     return resp.json(data)
+  },
+
+  async cheapProduct(req,resp,next){
+    let product;
+
+    try{
+      product = await Product.find({price: {$lt:600}}).limit(5)
+
+      if(!product[0]){
+        return resp.json("No product found")
+      }
+    }
+    catch(err){
+      return next(err)
+    }
+
+    return resp.json(product)
   }
 
 };

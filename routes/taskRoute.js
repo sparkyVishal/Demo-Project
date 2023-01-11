@@ -15,6 +15,12 @@ router.get('/show_task',auth, taskController.show_task);
 
 router.get('/search/:key', taskController.search);
 
+router.delete('/task_delete/:id',auth, taskController.delete)
+
+router.post('/modify', taskController.modify)
+
+router.post('/remove_key', taskController.removeKey)
+
 
 
 export default router;

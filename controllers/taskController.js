@@ -94,6 +94,51 @@ const taskController = {
       }
 
       resp.json(data)
+    },
+
+    async delete(req, resp, next){
+
+        const {user} = req;
+
+        if(!user){
+            return next(new Error("You are not authorized to delete task"))
+        }
+
+        const data = await Task.findOneAndDelete({$and:[{created_by:user._id},{_id: req.params.id}]})
+
+        if(!data){
+            return resp.status(400).json("Task not found")
+        }
+
+        return resp.json({"msg":"successfully task deleted",data})
+
+    },
+
+    async modify(req, resp, next){
+
+        let data;
+        try{
+
+            data = await Task.updateMany({task_type: "private"}, {$set: {"stat": "private", "result": "demo"}}, {new: true})
+        }
+        catch(err){
+            return resp.json(err)
+        }
+
+        return resp.json(data)
+    },
+
+    async removeKey(req,resp,next){
+        let data;
+        try{
+            data = await Task.updateMany([ { $unset: "result" } ]).where({task_type: "private"})
+
+        }
+        catch(err){
+            return next(err)
+        }
+
+        return resp.json(data)
     }
 }
 

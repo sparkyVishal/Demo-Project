@@ -26,5 +26,6 @@ router.get('/search_by_pricee', productController.producttprice)
 
 router.post('/updateall', productController.updateAll)
 
+router.get('/cheapProduct', productController.cheapProduct)
 
 export default router;

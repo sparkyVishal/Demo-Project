@@ -10,6 +10,9 @@ const taskSchema = new Schema({
     description : {type: String, required: true},
     task_type : {type: String, required: true},
     created_by : {type: mongoose.SchemaTypes.ObjectId, required: true, ref: 'User'},
+    stat       :  {type: String},
+    result: {type:String}
+    
     
 }, {timestamps: true, toJSON:{ getters:true }, id: false});
 
