@@ -10,6 +10,7 @@ const taskController = {
         const{title, description, task_type} = req.body;
 
         if(title && description && task_type){
+
             
             let document;
 
@@ -20,12 +21,12 @@ const taskController = {
                     task_type,
                     created_by: user._id
                 })
+                resp.status(201).json({"msg": "task created" , document})
             }
             catch(err){
                 return next(err)
             }
       
-            resp.status(201).json({"msg": "task created" , document})
 
         }
         else{
@@ -82,12 +83,10 @@ const taskController = {
     let data;
     console.log('req.params.key',req.params.key);
       try{
-        //  data = await Task.find({
-        //     title:new RegExp(req.params.key,'i')
-        //  }).select('-updatedAt -__v').sort({_id: -1});
-
+   
         data = await Task.find({
-            title:new RegExp(req.params.key,'i')}, {'updatedAt':0, '__v':0}).sort({_id: -1})
+            title:new RegExp(req.params.key,'i')}, {'updatedAt':0, '__v':0}).sort({_id: -1}).limit(3)
+
       }
       catch(err){
         return next(err)
@@ -128,6 +127,7 @@ const taskController = {
         return resp.json(data)
     },
 
+
     async removeKey(req,resp,next){
         let data;
         try{
@@ -141,7 +141,5 @@ const taskController = {
         return resp.json(data)
     }
 }
-
-
 
 export default taskController;

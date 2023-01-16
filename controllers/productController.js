@@ -7,9 +7,11 @@ import fs from "fs";
 import productSchema from "../validators/product";
 
 const productController = {
+  
   async store(req, resp, next) {
     const { error } = productSchema.validate(req.body);
     if (error) {
+      
       return next(error);
     }
     const { name, description, price, offer_price, discount, category } =
@@ -26,6 +28,7 @@ const productController = {
         category,
       });
     } catch (err) {
+      console.log(err);
       return next(err);
     }
 
@@ -93,7 +96,18 @@ const productController = {
     let documents;
 
     try {
-      documents = await Product.find()
+      // let {page} = req.query;
+      // let limit = 10;
+      // if(!page) page = 1;
+      
+      // const skip = (page-1) * 10;
+
+      let {page,limit} = req.query;
+      if(!page) page = 1;
+      if(!limit) limit = 2;
+      const skip = (page-1) * limit;
+    
+      documents = await Product.find().skip(skip).limit(limit)
         .select("-updatedAt -__v")
         .sort({ _id: -1 });
 
@@ -104,9 +118,7 @@ const productController = {
       return next(CustomErrorHandler.serverError());
     }
 
-    resp
-      .status(200)
-      .json({ status: "success", msg: "list of all products", documents });
+    resp.status(200).json({ status: "success", msg: "list of all products", documents });
   },
 
   async show(req, resp, next) {
