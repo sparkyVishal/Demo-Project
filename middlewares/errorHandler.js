@@ -4,9 +4,10 @@ import {ValidationError} from 'joi';
 import CustomErrorHandler from '../services/CustomErrorHandler';
 
 const errorHandler = (err, req, resp ,next) => {
-    let statusCode = 500;
+    let statusCode = 400;
     let data = {
-        message: "Internal Server Error",
+        // message: "Internal Server Error",
+        message: "Validation Error",
 
         ...(DEBUG_MODE === 'true' && {originalError : err.message})
     }

@@ -10,12 +10,11 @@ const productController = {
   
   async store(req, resp, next) {
     const { error } = productSchema.validate(req.body);
-    if (error) {
+    // if (error) {
       
-      return next(error);
-    }
-    const { name, description, price, offer_price, discount, category } =
-      req.body;
+    //   return next(error);
+    // }
+    const { name, description, price, discount, category } =req.body;
     let document;
 
     try {
@@ -23,12 +22,11 @@ const productController = {
         name,
         description,
         price,
-        offer_price,
         discount,
         category,
       });
     } catch (err) {
-      console.log(err);
+     
       return next(err);
     }
 
@@ -38,12 +36,11 @@ const productController = {
   async update(req, resp, next) {
     const { error } = productSchema.validate(req.body);
 
-    if (error) {
-      return next(error);
-    }
+    // if (error) {
+    //   return next(error);
+    // }
 
-    const { name, description, price, offer_price, discount, category } =
-      req.body;
+    const { name, description, price, discount, category } = req.body;
     let document;
 
     try {
@@ -53,11 +50,12 @@ const productController = {
           name,
           description,
           price,
-          offer_price,
           discount,
           category,
         },
-        { new: true }
+        // { new: true },
+        {runValidators: true}
+       
       );
     } catch (err) {
       return next(err);
@@ -75,15 +73,15 @@ const productController = {
 
     //image delete
 
-    const imagePath = document._doc.image;
+    //const imagePath = document._doc.image;
 
     //const imagePath = document.image;
 
-    fs.unlink(`${appRoot}/${imagePath}`, (err) => {
-      if (err) {
-        return next(CustomErrorHandler.serverError());
-      }
-    });
+    // fs.unlink(`${appRoot}/${imagePath}`, (err) => {
+    //   if (err) {
+    //     return next(CustomErrorHandler.serverError());
+    //   }
+    // });
 
     resp.json({
       status: "success",
@@ -174,9 +172,19 @@ const productController = {
   async productCategory(req, resp, next) {
     let data;
     try {
-      data = await Product.find({
-         category: { $regex: req.query.category, $options: "$i" } ,
-      });
+      data = await Product.find(
+        // {
+        //  category: { $regex: req.query.category, $options: "$i" } ,
+        // }
+        {
+          category: new RegExp(req.query.category, "i"),
+        },
+        { updatedAt: 0, __v: 0 }
+      ).sort({ _id: -1 });
+
+      if(!data[0]){
+        return resp.json({msg: "Nothing to show"})
+      }
     } catch (err) {
       return next(err);
     }
@@ -185,11 +193,17 @@ const productController = {
   },
 
   async productDiscount(req, resp, next) {
+ 
     let data;
     try {
       data = await Product.find({
-            discount: { "$gt": "10%" },
+            discount: { "$gt": 10},
       });
+      
+      if(!data[0]){
+       
+        return resp.status(400).json({msg:"No data found"})
+      }
     } catch (err) {
       return next(err);
     }
@@ -203,6 +217,12 @@ const productController = {
       data = await Product.find({
         $and: [{ price: { $gt: 100 } }, { discount: { $gt: 20 } }],
       });
+
+      if(!data[0]){
+       
+        return resp.status(400).json({msg:"No data found"})
+      }
+
     } catch (err) {
       return next(err);
     }

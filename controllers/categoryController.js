@@ -51,7 +51,7 @@ const categoryController = {
                 }
 
                 else if(name_exist){
-                    resp.status(400).json({ "status": "failed", "msg": "This name is alreday taken" })
+                    resp.status(400).json({ "status": "failed", "msg": "This category name is alreday taken" })
                 }
                 
                 
@@ -120,7 +120,7 @@ const categoryController = {
                     price,
                    
                     ...(req.file && {image: filePath})
-                }, {new: true});
+                }, {runValidators: true})
             } catch(err){
                 return next(err)
             }

@@ -21,6 +21,16 @@ router.post('/modify', taskController.modify)
 
 router.post('/remove_key', taskController.removeKey)
 
+router.get('/findUser', taskController.showUserTaskInfo)
+
+router.get('/findTask', taskController.showTaskUserInfo)
+
+router.get('/add_field', taskController.addField)
+
+router.get('/users',taskController.userList)
+
+router.get('/user/:id', taskController.singleUser)
+
 
 
 export default router;

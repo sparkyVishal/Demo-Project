@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
     name : {type: String, requird: true},
-    email : {type: String, requird: true, unique: true},
+    email : {type: String, requird: true, unique: true, lowercase: true},
     password : {type: String, requird: true},
     role : {type: String, default: 'admin'},
     mobile : {type: Number, requird: true, unique: true},
@@ -15,5 +15,20 @@ const userSchema = new Schema({
     }},
 
 }, {timestamps: true, toJSON:{ getters:true }, id: false});
+
+userSchema.pre(/^find/, function(next){
+   this.find().select(['-password','-__v','-createdAt','-updatedAt'])
+   next()
+})
+
+// userSchema.pre('aggregate', function(next){
+//     this.pipeline().forEach((el)=>{ return el.select('-password')})
+//     console.log(this.pipeline());
+//     next()
+//  })
+
+// userSchema.post('find', function(doc,next){
+//     next()
+// })   
 
 export default mongoose.model('User', userSchema, "users")

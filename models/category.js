@@ -5,9 +5,9 @@ import { APP_URL } from "../config";
 const Schema = mongoose.Schema;
 
 const categorySchema = new Schema({
-    cat_name : {type: String, required: true, unique: true},
-    price : {type: Number, required: true},
-    category_image : {type: String, required: true,  get: (category_image) => {
+    cat_name : {type: String, required: [true, "category name field is required"], unique: [true, "This category name is taken"]},
+    price : {type: Number, required: [true, "price field is required"]},
+    category_image : {type: String, required: [true, "image field is required"],  get: (category_image) => {
 
         return `${APP_URL}/${category_image}`;
     }},
