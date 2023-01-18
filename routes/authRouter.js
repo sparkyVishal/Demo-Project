@@ -5,6 +5,7 @@ import admin from '../middlewares/admin';
 
 const router = express.Router();
 
+
 router.post('/register', registerController.register);
 
 router.post('/login', loginController.login);
@@ -16,6 +17,12 @@ router.post('/refresh',auth, refreshController.refresh);
 router.post('/logout',auth, loginController.logout);
 
 router.post('/change_password',auth, loginController.change_password);
+
+router.put('/update/',auth,userController.updateUser )
+
+router.delete('/delete',auth, userController.deleteUser)
+
+router.get('/searchUser', userController.searchUser)
 
 export default router;
 

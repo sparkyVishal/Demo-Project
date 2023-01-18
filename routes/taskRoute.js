@@ -15,7 +15,7 @@ router.get('/show_task',auth, taskController.show_task);
 
 router.get('/search/:key', taskController.search);
 
-router.delete('/task_delete/:id',auth, taskController.delete)
+router.delete('/task_delete/:id',auth, taskController.deleteTask)
 
 router.post('/modify', taskController.modify)
 
@@ -30,6 +30,10 @@ router.get('/add_field', taskController.addField)
 router.get('/users',taskController.userList)
 
 router.get('/user/:id', taskController.singleUser)
+
+router.get('/task_list', taskController.taskList)
+
+router.get('/single_task/:id', taskController.singleTask)
 
 
 

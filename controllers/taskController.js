@@ -91,7 +91,7 @@ const taskController = {
     resp.json(data);
   },
 
-  async delete(req, resp, next) {
+  async deleteTask(req, resp, next) {
     const { user } = req;
 
     if (!user) {
@@ -194,47 +194,49 @@ const taskController = {
   },
 
   async userList(req,resp,next){
-    let data,map;
+    // let data,map;
     try{
       // data = await User.find()
-       map = {
-        "$map": {
-            "input": { "$split": [ "$name", " " ] },
-            "as": "name",
-            "in": {                                                                             
-                "$concat": [
-                    { "$toUpper": { "$substrCP": ["$$name", 0, 1] } }, 
-                    {                                                           
-                        "$substrCP": [
-                            "$$name",
-                            1,
-                            { "$subtract": [{ "$strLenCP": "$$name" }, 1 ]}
-                        ] 
-                    }
-                ]
-            }
-        }
-    };
+  //      map = {
+  //       "$map": {
+  //           "input": { "$split": [ "$name", " " ] },
+  //           "as": "name",
+  //           "in": {                                                                             
+  //               "$concat": [
+  //                   { "$toUpper": { "$substrCP": ["$$name", 0, 1] } }, 
+  //                   {                                                           
+  //                       "$substrCP": [
+  //                           "$$name",
+  //                           1,
+  //                           { "$subtract": [{ "$strLenCP": "$$name" }, 1 ]}
+  //                       ] 
+  //                   }
+  //               ]
+  //           }
+  //       }
+  //   };
 
-   data =  await User.aggregate([
-        {
-            "$addFields": {
-                "name": {
-                    "$concat": [
-                        { "$arrayElemAt": [map, 0] }
+  //  data =  await User.aggregate([
+  //       {
+  //           "$addFields": {
+  //               "name": {
+  //                   "$concat": [
+  //                       { "$arrayElemAt": [map, 0] }
                        
-                    ]
-                }
-            }
-        }
-    ]);
+  //                   ]
+  //               }
+  //           }
+  //       }
+  //   ]);
+
+  const data = await User.find()
+  return resp.json(data)
 
     }
     catch(err){
       return next(err)
     }
     
-    return resp.json(data)
   },
 
   async singleUser(req,resp,next){
@@ -255,6 +257,28 @@ const taskController = {
     const capitalized = userName.charAt(0).toUpperCase()+ userName.slice(1)
     console.log(capitalized);
     return resp.json({user,capitalized})
+  },
+
+
+  async taskList(req,resp,next){
+    try{
+      const list = await Task.find().sort({ _id: -1 });
+
+      return resp.json(list)
+    }
+    catch(err){
+      return next(err)
+    }
+  },
+
+  async singleTask(req,resp,next){
+    try{
+      const task = await Task.findOne({_id: req.params.id})
+      return resp.json(task)
+    }
+    catch(err){
+      return next(err)
+    }
   }
 
 

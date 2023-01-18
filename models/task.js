@@ -5,25 +5,38 @@ import { APP_URL } from "../config";
 
 const Schema = mongoose.Schema;
 
-const taskSchema = new Schema({
-    title : {type: String, required: [true, "title field is required"]},
-    description : {type: String, required: [true, "description field is required"]},
-    task_type : {type: String, required: true, enum: {values:['PUBLIC', 'PRIVATE'], message: 'type is either PUBLIC or PRIVATE'} },
+const taskSchema = new Schema(
+  {
+    title: { type: String, required: [true, "title field is required"] },
+    description: {
+      type: String,
+      required: [true, "description field is required"],
+    },
+    task_type: {
+      type: String,
+      required: true,
+      enum: {
+        values: ["PUBLIC", "PRIVATE"],
+        message: "type is either PUBLIC or PRIVATE",
+      },
+    },
 
-    created_by : {type: mongoose.SchemaTypes.ObjectId, required: true, ref: 'User'},
-    stat       :  {type: String},
-    result: {type:String},
-    
-    skills: {type:String}
-    
-    
-}, {timestamps: true, toJSON:{ getters:true }, id: false});
+    created_by: {
+      type: mongoose.SchemaTypes.ObjectId,
+      required: true,
+      ref: "User",
+    },
+    stat: { type: String },
+    result: { type: String },
 
-// taskSchema.pre('find', function(){
-//     // console.log("before find", this);
+    skills: { type: String },
+  },
+  { timestamps: true, toJSON: { getters: true }, id: false }
+);
 
-//     this.find({title: {$ne: "hloo"}})
-    
+// taskSchema.pre('save', function(){
+//     // console.log("before save", this);
+//     this.title = undefined
 // })
 
 // taskSchema.post('save', function(doc){
@@ -31,4 +44,4 @@ const taskSchema = new Schema({
 //     this.title = undefined
 // })
 
-export default mongoose.model('Task', taskSchema, "tasks")
+export default mongoose.model("Task", taskSchema, "tasks");

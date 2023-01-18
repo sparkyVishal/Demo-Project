@@ -25,7 +25,7 @@ const loginController = {
                 return next(CustomErrorHandler.wrongCrediantals("Email or password is incorrect"))
             }
 
-            const match = await bcrypt.compare(req.body.password, user.password) 
+            const match =  bcrypt.compare(req.body.password, user.password) 
             if(!match){
                 return next(CustomErrorHandler.wrongCrediantals("Email or password is incorrect"))
             }
