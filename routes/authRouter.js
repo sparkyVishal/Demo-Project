@@ -24,6 +24,10 @@ router.delete('/delete',auth, userController.deleteUser)
 
 router.get('/searchUser', userController.searchUser)
 
+router.post('/send-mail', userController.sendMail)
+
+router.get('/send_otp', userController.sendOtp)
+
 export default router;
 
 

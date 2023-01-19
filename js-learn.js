@@ -47,5 +47,10 @@ total.forEach((element,index)=> {
 
 console.log(result);
 
+// set token in global variable
+
+var jsonData = JSON.parse(responseBody);
+postman.setEnvironmentVariable("token", jsonData.access_token);
+
 
 

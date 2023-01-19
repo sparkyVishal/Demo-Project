@@ -260,7 +260,8 @@ const productController = {
     let product;
 
     try{
-      product = await Product.find({price: {$lt:600}}).limit(5)
+      // product = await Product.find({price: {$lt:600}}).sort({ _id: -1 })
+      product = await Product.aggregate([{$match:{price : {$lt:600}}}]).sort({ _id: -1 })
 
       if(!product[0]){
         return resp.json("No product found")

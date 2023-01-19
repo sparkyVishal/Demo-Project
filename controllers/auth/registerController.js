@@ -8,6 +8,7 @@ import multer from "multer";
 import path from 'path';
 import fs from 'fs';
 
+
 const storage = multer.diskStorage({
     destination : (req,file,cb) => cb(null, 'profile_pic/'),
     filename: (req,file,cb) => {
@@ -47,19 +48,19 @@ const registerController = {
                 mobile: Joi.number().required(),
             });
     
-            const {error} = registerSchema.validate(req.body);
+            // const {error} = registerSchema.validate(req.body);
     
-            if(error){
+            // if(error){
 
-                fs.unlink(`${appRoot2}/${filePath}`, (err) => {
-                    if(err){
+            //     fs.unlink(`${appRoot2}/${filePath}`, (err) => {
+            //         if(err){
 
-                        return next(CustomErrorHandler.serverError(err.message))
-                    }
-                });
+            //             return next(CustomErrorHandler.serverError(err.message))
+            //         }
+            //     });
 
-                return next(error)
-            }
+            //     return next(error)
+            // }
            
             let access_token;
             let refresh_token;
@@ -103,7 +104,10 @@ const registerController = {
             }
             resp.json({access_token, refresh_token, result})
         })
-    }
+    },
+    
 }
+
+
 
 export default registerController;

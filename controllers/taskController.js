@@ -161,15 +161,14 @@ const taskController = {
     let data
     try{
       data  = await Task.aggregate([
+         {$group:{_id : '$created_by'}},
         {
           $lookup: {
             from: "users",
             localField: "created_by",
             foreignField: "_id",
             as: "user_details",
-
-          },
-         
+          },  
       } ,
 
      ])
@@ -264,7 +263,19 @@ const taskController = {
     try{
       const list = await Task.find().sort({ _id: -1 });
 
-      return resp.json(list)
+      const count = await Task.count()
+
+
+      // const list = await Task.aggregate([{$match:{title : 'hloo'}}]).sort({ _id: -1 })
+
+      // const list = await Task.aggregate([{$group:{_id : '$created_by'}}])
+
+      //  const list = await Task.aggregate([{$match:{description : 'checkk'}}, {$count: "total count for this description is"}])
+
+
+      // const list = await Task.aggregate([{$project:{pro : 'project'}}])
+      
+      return resp.json({count,list})
     }
     catch(err){
       return next(err)

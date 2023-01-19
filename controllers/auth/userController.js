@@ -1,6 +1,8 @@
 import { Task, User } from "../../models";
 import CustomErrorHandler from "../../services/CustomErrorHandler";
 import Joi from "joi";
+import nodemailer from 'nodemailer';
+import fast2sms from 'fast-two-sms'
 
 const userController = {
     async user_details(req, resp, next) {
@@ -40,7 +42,8 @@ const userController = {
 
                 return resp.json(document);
                 
-            } 
+            }
+            
             }
 
         catch (err) {
@@ -80,6 +83,53 @@ const userController = {
         catch(err){
             return next(err)
         }
+    },
+
+    async sendMail(req,resp,next){
+        let transporter = nodemailer.createTransport({
+            host: 'smtp.gmail.com',
+            port: 587,
+            secure: false,
+            requireTLS: true,
+            auth: {
+                user: 'vishal.sharma@pairroxz.in',
+                pass: "YaJ7kD9PdQwC2G1wSH"
+            }
+        })
+
+        let mailOptions = {
+            from : 'la12x@tqest.com',
+            to: 'vishal.sharma@pairroxz.in',
+            subject: 'demo mail',
+            text: 'Hello user'
+        }
+
+        transporter.sendMail(mailOptions, function(error, info){
+            if(error){
+                console.log(error);
+            }
+            else{
+                console.log("email is sent", info.response);
+            }
+        })
+    },
+
+    async sendOtp(req,resp,next){
+        console.log("hii");
+        let options =
+        {
+            authorization:'tmHdGaCpxAyofrXDVB5bEIwWi7ZnS2Oqu6jFcPkNsLhQKU4z1vohpFgEnOMlabxNILDf60HGc9X7VBRW',
+            message: "This is your otp 5678",
+            numbers: ['8385015524']
+        }
+
+        fast2sms.sendMessage(options)
+            .then((response) => {
+                console.log(response);
+            })
+            .catch((error) => {
+                console.log(error);
+            })
     }
 };
 

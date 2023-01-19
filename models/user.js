@@ -1,13 +1,22 @@
 import mongoose from "mongoose";
 import { APP_URL } from "../config";
 import validator from "validator";
+import EmailValidator from 'email-validator';
+import { isEmail } from 'validator';
 
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema(
   {
     name: { type: String, required: [true, "name field is required"] },
-    email: { type: String, requird: [true, "email is required"], unique: true, lowercase: true },
+    email: { type: String, requird: [true, "email is required"], unique: true, lowercase: true,
+    validate: {
+      validator: function (v) {
+        return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v);
+      },message: '{VALUE} is not a valid email!'} 
+    
+    },
+
     password: { type: String, requird: [true, "password is required"], select:false},
     role: { type: String, default: "admin" },
     mobile: { type: Number, requird: [true, "mobile field is required"], unique: true , 
