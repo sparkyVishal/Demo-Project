@@ -11,6 +11,8 @@ const productSchema = new Schema({
     discount : {type: Number, required: [true, "discount is required"], trim: true},
     category : {type: String, required: true, enum: {values: ['Electronics', 'Beverages', 'Cosmetics', 'Food', 'Shoes'], message: 'category value must lie in between of Electronics or Beverages or Cosmetics or Food or Shoes'}},
 
+    offer: {type: String}
+
     // image : {type: String, required: true,  get: (image) => {
 
     //     return `${APP_URL}/${image}`;

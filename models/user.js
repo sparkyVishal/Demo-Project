@@ -10,10 +10,13 @@ const userSchema = new Schema(
   {
     name: { type: String, required: [true, "name field is required"] },
     email: { type: String, requird: [true, "email is required"], unique: true, lowercase: true,
-    validate: {
-      validator: function (v) {
-        return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v);
-      },message: '{VALUE} is not a valid email!'} 
+    // validate: {
+    //   validator:()=> validator.isEmail('email is required')
+    //   //  function (v) {
+    //   //   return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v);
+    //   // },message: '{VALUE} is not a valid email!'
+    // } 
+    validate: [validator.isEmail, 'Please provide a valid email']
     
     },
 

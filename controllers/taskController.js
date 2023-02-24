@@ -161,7 +161,7 @@ const taskController = {
     let data
     try{
       data  = await Task.aggregate([
-         {$group:{_id : '$created_by'}},
+        //  {$group:{_id : '$created_by'}},
         {
           $lookup: {
             from: "users",
@@ -169,7 +169,7 @@ const taskController = {
             foreignField: "_id",
             as: "user_details",
           },  
-      } ,
+      },
 
      ])
       return resp.json(data)
@@ -291,7 +291,6 @@ const taskController = {
       return next(err)
     }
   }
-
 
 };
 

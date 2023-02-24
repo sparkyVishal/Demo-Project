@@ -7,14 +7,14 @@ import fs from "fs";
 import productSchema from "../validators/product";
 
 const productController = {
-  
+
   async store(req, resp, next) {
     const { error } = productSchema.validate(req.body);
     // if (error) {
-      
+
     //   return next(error);
     // }
-    const { name, description, price, discount, category } =req.body;
+    const { name, description, price, discount, category } = req.body;
     let document;
 
     try {
@@ -26,7 +26,7 @@ const productController = {
         category,
       });
     } catch (err) {
-     
+
       return next(err);
     }
 
@@ -54,8 +54,8 @@ const productController = {
           category,
         },
         // { new: true },
-        {runValidators: true}
-       
+        { runValidators: true }
+
       );
     } catch (err) {
       return next(err);
@@ -97,14 +97,14 @@ const productController = {
       // let {page} = req.query;
       // let limit = 10;
       // if(!page) page = 1;
-      
+
       // const skip = (page-1) * 10;
 
-      let {page,limit} = req.query;
-      if(!page) page = 1;
-      if(!limit) limit = 2;
-      const skip = (page-1) * limit;
-    
+      let { page, limit } = req.query;
+      if (!page) page = 1;
+      if (!limit) limit = 2;
+      const skip = (page - 1) * limit;
+
       documents = await Product.find().skip(skip).limit(limit)
         .select("-updatedAt -__v")
         .sort({ _id: -1 });
@@ -160,7 +160,7 @@ const productController = {
     let data;
     try {
       data = await Product.find({
-      name: { $regex: req.query.name, $options: "$i" } ,
+        name: { $regex: req.query.name, $options: "$i" },
       });
     } catch (err) {
       return next(err);
@@ -182,8 +182,8 @@ const productController = {
         { updatedAt: 0, __v: 0 }
       ).sort({ _id: -1 });
 
-      if(!data[0]){
-        return resp.json({msg: "Nothing to show"})
+      if (!data[0]) {
+        return resp.json({ msg: "Nothing to show" })
       }
     } catch (err) {
       return next(err);
@@ -193,16 +193,16 @@ const productController = {
   },
 
   async productDiscount(req, resp, next) {
- 
+
     let data;
     try {
       data = await Product.find({
-            discount: { "$gt": 10},
+        discount: { "$gt": 10 },
       });
-      
-      if(!data[0]){
-       
-        return resp.status(400).json({msg:"No data found"})
+
+      if (!data[0]) {
+
+        return resp.status(400).json({ msg: "No data found" })
       }
     } catch (err) {
       return next(err);
@@ -218,9 +218,9 @@ const productController = {
         $and: [{ price: { $gt: 100 } }, { discount: { $gt: 20 } }],
       });
 
-      if(!data[0]){
-       
-        return resp.status(400).json({msg:"No data found"})
+      if (!data[0]) {
+
+        return resp.status(400).json({ msg: "No data found" })
       }
 
     } catch (err) {
@@ -234,8 +234,8 @@ const productController = {
     let data;
     try {
       data = await Product.find({
-        $or:[{price:{$lt:100}},{price:{$gt:200}}]
-        
+        $or: [{ price: { $lt: 100 } }, { price: { $gt: 200 } }]
+
       });
     } catch (err) {
       return next(err);
@@ -244,34 +244,60 @@ const productController = {
     return resp.json(data);
   },
 
-  async updateAll(req, resp, next){
+  async updateAll(req, resp, next) {
     let data;
-    try{
-        data = await Product.updateMany({ price: { $lte: 400 } },{ $inc: { price : 200 } })
+    try {
+      data = await Product.updateMany({ price: { $lte: 400 } }, { $inc: { price: 200 } })
     }
-    catch(err){
-        return next(err)
+    catch (err) {
+      return next(err)
     }
 
     return resp.json(data)
   },
 
-  async cheapProduct(req,resp,next){
+  async cheapProduct(req, resp, next) {
     let product;
 
-    try{
+    try {
       // product = await Product.find({price: {$lt:600}}).sort({ _id: -1 })
-      product = await Product.aggregate([{$match:{price : {$lt:600}}}]).sort({ _id: -1 })
+      product = await Product.aggregate([{ $match: { price: { $lt: 600 } } }]).sort({ _id: -1 })
 
-      if(!product[0]){
+      if (!product[0]) {
         return resp.json("No product found")
       }
     }
-    catch(err){
+    catch (err) {
       return next(err)
     }
 
     return resp.json(product)
+  },
+
+  async aggreFun(req, resp, next) {
+    let data
+    try {
+      const data = await Product.aggregate([
+
+        // {
+        //   $project: {
+        //     name: true, description: true, category: true, price: true, discount: true,
+        //     offerPrice: { $subtract: ["$price", { $multiply: ["$price", { $divide: ["$discount", 100] }] }] }
+        //   }
+
+        // }
+
+
+        { $unwind: { _id: "$price" } },
+        { $project: { name: 1, description: 1, category: 1, price: 1, discount: 1 } }
+
+      ])
+
+      return resp.json(data)
+    }
+    catch (err) {
+      return next(err)
+    }
   }
 
 };

@@ -67,7 +67,7 @@ const registerController = {
             let result;
     
             try{
-                const {name, email, password, mobile} = req.body;
+                const {name, email, password, mobile,confirm_password} = req.body;
 
                 const exist = await User.exists({email});
                 if(exist){
@@ -79,27 +79,31 @@ const registerController = {
                     return next(CustomErrorHandler.alreadyExist("This mobile number is already taken"))
                 }
 
-                
-                const hashPassword = await bcrypt.hash(password , 10);
-    
-                const user = new User({
-                    name,
-                    email,
-                    password: hashPassword,
-                    profile_pic: filePath,
-                    mobile,
-                })
+                if (password === confirm_password) {
 
-                result = await user.save();
-            
+                    const hashPassword = await bcrypt.hash(password , 10);
+                    const user = new User({
+                        name,
+                        email,
+                        password: hashPassword,
+                        profile_pic: filePath,
+                        mobile,
+                    })
+                    result = await user.save();
+                    access_token =  JwtService.sign({_id: result._id , role: result.role});
+                    refresh_token =  JwtService.sign({_id: result._id , role: result.role}, '1y', REFRESH_SECRET);
+        
+                    await RefreshToken.create({token:refresh_token })
+                }
+                else{
+                    resp.send({ "status": "failed", "message": "password and password confirmation must be match" })
+                }
+               
                 //token
-                access_token =  JwtService.sign({_id: result._id , role: result.role});
-                refresh_token =  JwtService.sign({_id: result._id , role: result.role}, '1y', REFRESH_SECRET);
-    
-                await RefreshToken.create({token:refresh_token })
 
             }
             catch(err){
+              
                 return next(err);
             }
             resp.json({access_token, refresh_token, result})

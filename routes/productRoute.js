@@ -28,4 +28,6 @@ router.post('/updateall', productController.updateAll)
 
 router.get('/cheapProduct', productController.cheapProduct)
 
+router.get('/aggre', productController.aggreFun)
+
 export default router;
